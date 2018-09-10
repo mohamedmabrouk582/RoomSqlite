@@ -37,10 +37,12 @@ public class AddTodoViewModel<v extends AddTodoView> extends BaseViewModel<v> im
     private ObservableList<String> error=new ObservableArrayList<>();
     private String name,des,catogery;
     private Context context;
+    private TodoDao todoDao;
     private List<String> list= Arrays.asList("Android","Ios","Kotlin","java");
     private ArrayAdapter<String> adapter;
-    public AddTodoViewModel(@NonNull Application application) {
+    public AddTodoViewModel(@NonNull Application application,TodoDao todoDao) {
         super(application);
+        this.todoDao=todoDao;
         context=application.getBaseContext();
 
         setupAdapter();
@@ -70,7 +72,7 @@ public class AddTodoViewModel<v extends AddTodoView> extends BaseViewModel<v> im
 
         @Override
         protected Long doInBackground(Todo... todos) {
-            return TodoDb.getDao(context).insertTodo(todos[0]);
+            return todoDao.insertTodo(todos[0]);
         }
 
         @Override
@@ -164,15 +166,17 @@ public class AddTodoViewModel<v extends AddTodoView> extends BaseViewModel<v> im
 
     public static class AddTodoViewModelFactory implements ViewModelProvider.Factory{
         private Application application;
+        private TodoDao todoDao;
 
-        public AddTodoViewModelFactory(Application application) {
+        public AddTodoViewModelFactory(Application application,TodoDao todoDao) {
             this.application = application;
+            this.todoDao=todoDao;
         }
 
         @NonNull
         @Override
         public AddTodoViewModel create(@NonNull Class modelClass) {
-            return new AddTodoViewModel(application);
+            return new AddTodoViewModel(application,todoDao);
         }
     }
 

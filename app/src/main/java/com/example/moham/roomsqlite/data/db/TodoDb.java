@@ -13,17 +13,4 @@ import com.example.moham.roomsqlite.data.model.Todo;
 @Database(exportSchema = false , version = 3,entities = Todo.class)
 public abstract class TodoDb extends RoomDatabase {
     public abstract TodoDao getTodoDao();
-    private static TodoDao dao;
-    public static TodoDao getDao(Context context){
-        if (dao==null){
-            dao= Room.databaseBuilder(context,TodoDb.class,"todo").addMigrations(new Migration(2,3) {
-                @Override
-                public void migrate(@NonNull SupportSQLiteDatabase database) {
-                    database.execSQL("ALTER TABLE todo ADD COLUMN types TEXT");
-                }
-            }).build().getTodoDao();
-        }
-        return dao;
-    }
-
 }

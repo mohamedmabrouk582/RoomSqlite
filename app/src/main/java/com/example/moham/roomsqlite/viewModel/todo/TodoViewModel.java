@@ -26,13 +26,14 @@ import java.util.concurrent.ExecutionException;
 
 public class TodoViewModel<v extends TodoView> extends BaseViewModel<v> implements TodoVmodel<v> {
     private Context mContext;
-
+    private TodoDao todoDao;
     private ArrayAdapter<String> adapter;
     private List<String> list= Arrays.asList("Android","Ios","Kotlin","java");
 
-    public TodoViewModel(@NonNull Application application) {
+    public TodoViewModel(@NonNull Application application,TodoDao todoDao) {
         super(application);
         mContext=application.getApplicationContext();
+        this.todoDao=todoDao;
         adapter=new ArrayAdapter<String>(mContext,android.R.layout.simple_list_item_1,list);
     }
 
@@ -59,7 +60,7 @@ public class TodoViewModel<v extends TodoView> extends BaseViewModel<v> implemen
     };
 
     public void catList(String s){
-        getView().loadTodos(TodoDb.getDao(mContext).fetchTodoListByCategory(s));
+        getView().loadTodos(todoDao.fetchTodoListByCategory(s));
     }
 
     @Override
@@ -68,7 +69,7 @@ public class TodoViewModel<v extends TodoView> extends BaseViewModel<v> implemen
     }
 
     public void getAllData(){
-         getView().loadTodos(TodoDb.getDao(mContext).fetchAllTodos());
+         getView().loadTodos(todoDao.fetchAllTodos());
     }
 
     public Integer delete(Todo todo) throws ExecutionException, InterruptedException {
@@ -79,21 +80,23 @@ public class TodoViewModel<v extends TodoView> extends BaseViewModel<v> implemen
 
         @Override
         protected Integer doInBackground(Todo... todos) {
-            return TodoDb.getDao(mContext).deleteTodo(todos[0]);
+            return todoDao.deleteTodo(todos[0]);
         }
     }
 
     public static class TodoViewModelFactory implements ViewModelProvider.Factory{
         private Application application;
+        private TodoDao todoDao;
 
-        public TodoViewModelFactory(Application application) {
+        public TodoViewModelFactory(Application application,TodoDao todoDao) {
             this.application = application;
+            this.todoDao=todoDao;
         }
 
         @NonNull
         @Override
         public  TodoViewModel create(@NonNull Class modelClass) {
-            return new TodoViewModel(application);
+            return new TodoViewModel(application,todoDao);
         }
     }
 }
